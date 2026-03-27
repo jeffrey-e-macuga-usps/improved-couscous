@@ -17,14 +17,41 @@ const Activities = () => {
       .catch(err => console.error('Error fetching activities:', err));
   }, [url]);
 
+  // Get all unique keys for table headers
+  const allKeys = Array.from(
+    activities.reduce((keys, item) => {
+      Object.keys(item).forEach(k => keys.add(k));
+      return keys;
+    }, new Set())
+  );
+
   return (
-    <div>
-      <h2>Activities</h2>
-      <ul>
-        {activities.map((activity, idx) => (
-          <li key={activity.id || idx}>{JSON.stringify(activity)}</li>
-        ))}
-      </ul>
+    <div className="card mb-4">
+      <div className="card-body">
+        <h2 className="card-title display-6 mb-4">Activities</h2>
+        <div className="table-responsive">
+          <table className="table table-striped table-bordered align-middle">
+            <thead className="table-light">
+              <tr>
+                {allKeys.length === 0 ? <th>No Data</th> : allKeys.map(key => <th key={key}>{key}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {activities.length === 0 ? (
+                <tr><td colSpan={allKeys.length || 1} className="text-center">No activities found.</td></tr>
+              ) : (
+                activities.map((activity, idx) => (
+                  <tr key={activity.id || idx}>
+                    {allKeys.map(key => (
+                      <td key={key}>{typeof activity[key] === 'object' && activity[key] !== null ? JSON.stringify(activity[key]) : activity[key]}</td>
+                    ))}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

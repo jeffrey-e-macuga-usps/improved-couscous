@@ -17,14 +17,41 @@ const Users = () => {
       .catch(err => console.error('Error fetching users:', err));
   }, [url]);
 
+  // Get all unique keys for table headers
+  const allKeys = Array.from(
+    users.reduce((keys, item) => {
+      Object.keys(item).forEach(k => keys.add(k));
+      return keys;
+    }, new Set())
+  );
+
   return (
-    <div>
-      <h2>Users</h2>
-      <ul>
-        {users.map((user, idx) => (
-          <li key={user.id || idx}>{JSON.stringify(user)}</li>
-        ))}
-      </ul>
+    <div className="card mb-4">
+      <div className="card-body">
+        <h2 className="card-title display-6 mb-4">Users</h2>
+        <div className="table-responsive">
+          <table className="table table-striped table-bordered align-middle">
+            <thead className="table-light">
+              <tr>
+                {allKeys.length === 0 ? <th>No Data</th> : allKeys.map(key => <th key={key}>{key}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {users.length === 0 ? (
+                <tr><td colSpan={allKeys.length || 1} className="text-center">No users found.</td></tr>
+              ) : (
+                users.map((user, idx) => (
+                  <tr key={user.id || idx}>
+                    {allKeys.map(key => (
+                      <td key={key}>{typeof user[key] === 'object' && user[key] !== null ? JSON.stringify(user[key]) : user[key]}</td>
+                    ))}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
